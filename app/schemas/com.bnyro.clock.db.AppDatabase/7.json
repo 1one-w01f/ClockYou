@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "d45a5ded9adf0b359cf66cd9dd06b11a",
+    "identityHash": "bf462bf913a227c1870f7b3e0312cbec",
     "entities": [
       {
         "tableName": "timeZones",
@@ -45,7 +45,7 @@
       },
       {
         "tableName": "alarms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `time` INTEGER NOT NULL, `label` TEXT, `enabled` INTEGER NOT NULL, `days` TEXT NOT NULL, `vibrate` INTEGER NOT NULL, `soundName` TEXT, `soundUri` TEXT, `repeat` INTEGER NOT NULL DEFAULT 1, `snoozeEnabled` INTEGER NOT NULL DEFAULT 1, `snoozeMinutes` INTEGER NOT NULL DEFAULT 10, `soundEnabled` INTEGER NOT NULL DEFAULT 1)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `time` INTEGER NOT NULL, `label` TEXT, `enabled` INTEGER NOT NULL, `days` TEXT NOT NULL, `vibrate` INTEGER NOT NULL, `soundName` TEXT, `soundUri` TEXT, `tzOffset` INTEGER, `tzName` TEXT, `repeat` INTEGER NOT NULL DEFAULT 1, `snoozeEnabled` INTEGER NOT NULL DEFAULT 1, `snoozeMinutes` INTEGER NOT NULL DEFAULT 10, `soundEnabled` INTEGER NOT NULL DEFAULT 1)",
         "fields": [
           {
             "fieldPath": "id",
@@ -96,6 +96,18 @@
             "notNull": false
           },
           {
+            "fieldPath": "tzOffset",
+            "columnName": "tzOffset",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "tzName",
+            "columnName": "tzName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "repeat",
             "columnName": "repeat",
             "affinity": "INTEGER",
@@ -137,7 +149,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd45a5ded9adf0b359cf66cd9dd06b11a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bf462bf913a227c1870f7b3e0312cbec')"
     ]
   }
 }

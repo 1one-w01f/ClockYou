@@ -89,7 +89,7 @@ fun AlarmRow(alarm: Alarm, alarmModel: AlarmModel) {
                 )
                 Text(
                     modifier = Modifier.padding(start = 6.dp),
-                    text = "$relativeTimeString."
+                    text = (alarm.tzName ?: "Local") + " ($relativeTimeString)"
                 )
             }
 

@@ -32,7 +32,7 @@ fun AppNavHost(
         composable(NavRoutes.Alarm.route) {
             AlarmScreen(onClickSettings = {
                 navController.navigate(NavRoutes.Settings.route)
-            }, alarmModel)
+            }, alarmModel, clockModel)
         }
         composable(NavRoutes.Clock.route) {
             ClockScreen(onClickSettings = {
