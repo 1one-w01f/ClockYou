@@ -72,7 +72,11 @@ class AlarmService : Service() {
         stop()
         timer.cancel()
         Log.d("Alarm Service", "Destroying service")
-        unregisterReceiver(alarmActionReciever)
+        try { // todo: this is an ugly hack to deal w/ java.lang.RuntimeException: Unable to stop service com.bnyro.clock.services.AlarmService@c71cea0: java.lang.IllegalArgumentException: Receiver not registered: com.bnyro.clock.services.AlarmService$alarmActionReciever$1@929ea59
+            unregisterReceiver(alarmActionReciever)
+        } catch (e: Exception) {
+            Log.e("AlarmService", "exception $e")
+        }
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         super.onDestroy()
     }

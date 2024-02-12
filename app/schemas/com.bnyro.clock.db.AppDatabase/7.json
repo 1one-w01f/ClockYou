@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "bf462bf913a227c1870f7b3e0312cbec",
+    "identityHash": "7c8f3d7537f607d70c2c05d38bc38c9e",
     "entities": [
       {
         "tableName": "timeZones",
@@ -45,7 +45,7 @@
       },
       {
         "tableName": "alarms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `time` INTEGER NOT NULL, `label` TEXT, `enabled` INTEGER NOT NULL, `days` TEXT NOT NULL, `vibrate` INTEGER NOT NULL, `soundName` TEXT, `soundUri` TEXT, `tzOffset` INTEGER, `tzName` TEXT, `repeat` INTEGER NOT NULL DEFAULT 1, `snoozeEnabled` INTEGER NOT NULL DEFAULT 1, `snoozeMinutes` INTEGER NOT NULL DEFAULT 10, `soundEnabled` INTEGER NOT NULL DEFAULT 1)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `time` INTEGER NOT NULL, `label` TEXT, `enabled` INTEGER NOT NULL, `days` TEXT NOT NULL, `vibrate` INTEGER NOT NULL, `soundName` TEXT, `soundUri` TEXT, `tzId` TEXT, `tzDisplayName` TEXT, `repeat` INTEGER NOT NULL DEFAULT 1, `snoozeEnabled` INTEGER NOT NULL DEFAULT 1, `snoozeMinutes` INTEGER NOT NULL DEFAULT 10, `soundEnabled` INTEGER NOT NULL DEFAULT 1)",
         "fields": [
           {
             "fieldPath": "id",
@@ -96,14 +96,14 @@
             "notNull": false
           },
           {
-            "fieldPath": "tzOffset",
-            "columnName": "tzOffset",
-            "affinity": "INTEGER",
+            "fieldPath": "tzId",
+            "columnName": "tzId",
+            "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "tzName",
-            "columnName": "tzName",
+            "fieldPath": "tzDisplayName",
+            "columnName": "tzDisplayName",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -149,7 +149,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bf462bf913a227c1870f7b3e0312cbec')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7c8f3d7537f607d70c2c05d38bc38c9e')"
     ]
   }
 }

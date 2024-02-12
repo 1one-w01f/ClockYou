@@ -50,6 +50,14 @@
                 android:name=".receivers.AlarmReceiver"
                 android:exported="false" />
         <receiver
+                android:name=".receivers.TimezoneReceiver"
+                android:exported="false"
+                android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+        <receiver
                 android:name=".receivers.BootReceiver"
                 android:directBootAware="true"
                 android:enabled="true"

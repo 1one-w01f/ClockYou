@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.bnyro.clock.R
 import com.bnyro.clock.obj.Alarm
@@ -12,9 +13,23 @@ import com.bnyro.clock.receivers.AlarmReceiver
 import com.bnyro.clock.ui.MainActivity
 import java.util.Calendar
 import java.util.GregorianCalendar
+import java.util.TimeZone
 
 object AlarmHelper {
     const val EXTRA_ID = "alarm_id"
+
+//    fun enqueueWithTimezoneAdjustment(context: Context, alarm: Alarm) {
+//        cancel(context, alarm)
+//        if (!alarm.enabled) {
+//            return
+//        }
+//        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+//        val alarmInfo = AlarmManager.AlarmClockInfo(
+//            getAlarmScheduleTimeWithTimezoneAdjustment(alarm),
+//            getOpenAppIntent(context, alarm)
+//        )
+//        alarmManager.setAlarmClock(alarmInfo, getPendingIntent(context, alarm))
+//    }
 
     fun enqueue(context: Context, alarm: Alarm) {
         cancel(context, alarm)
@@ -23,7 +38,8 @@ object AlarmHelper {
         }
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmInfo = AlarmManager.AlarmClockInfo(
-            getAlarmScheduleTime(alarm),
+//            getAlarmScheduleTime(alarm),
+            getAlarmScheduleTimeWithTimezoneAdjustment(alarm),
             getOpenAppIntent(context, alarm)
         )
         alarmManager.setAlarmClock(alarmInfo, getPendingIntent(context, alarm))
@@ -60,6 +76,53 @@ object AlarmHelper {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+    }
+
+    /**
+     * Calculate the epoch time for scheduling an alarm with timezone adjustment
+     */
+    private fun getAlarmScheduleTimeWithTimezoneAdjustment(alarm: Alarm): Long {
+        val calendar = GregorianCalendar()
+        calendar.time = TimeHelper.currentTime
+
+        // reset the calendar time to the start of the day
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+
+        var alarmTz = TimeZone.getDefault()
+        if (alarm.tzId != null) {
+            alarmTz = TimeZone.getTimeZone(alarm.tzId)
+        }
+        val alarmTzOffset = alarmTz.getOffset(Calendar.getInstance().timeInMillis)
+
+        val localTz = TimeZone.getDefault()
+        val localTzOffset = localTz.getOffset(Calendar.getInstance().timeInMillis)
+
+        // add the milliseconds from the new alarm
+        calendar.add(Calendar.MILLISECOND, alarm.time.toInt() - alarmTzOffset + localTzOffset)
+        Log.d("myTag", "original alarm time = ${calendar.time.time}")
+
+//        // adjust for alarm timezone and local offsets
+//        calendar.add(Calendar.MILLISECOND, -1 * localTzOffset)
+//        Log.d("myTag", "after minus localtz alarm time = ${calendar.time.time}")
+//
+//        calendar.add(Calendar.MILLISECOND, alarmTzOffset)
+//        Log.d("myTag", "after adding alarm timezine = ${calendar.time.time}")
+//        // if this alarm is local (has no timezone specified), and
+//        // the event has already passed for the day, then schedule for the next day
+//        if (alarm.tzId == null && calendar.time.time < TimeHelper.currentTime.time) {
+//            calendar.add(Calendar.HOUR_OF_DAY, 24)
+//            Log.d("myTag", "passed for the day adjustment = ${calendar.time.time}")
+//        }
+
+        // if the event has already passed for the day, schedule for the next day
+        if (calendar.time.time < TimeHelper.currentTime.time) {
+            calendar.add(Calendar.HOUR_OF_DAY, 24)
+            Log.d("myTag", "passed for the day adjustment = ${calendar.time.time}")
+        }
+        return calendar.timeInMillis
     }
 
     /**

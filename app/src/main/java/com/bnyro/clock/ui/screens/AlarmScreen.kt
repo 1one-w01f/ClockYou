@@ -233,8 +233,8 @@ fun AlarmScreen(
 
 
                         val alarm = Alarm(
-                            time = alarmTime, tzName = timezone.displayName,
-                            tzOffset = timezone.offset)
+                            time = alarmTime, tzId = timezone.name,
+                            tzDisplayName = timezone.displayName)
                         alarmModel.createAlarm(alarm)
 
                         Log.d("myTag", "timezome " + timezone.countryName)

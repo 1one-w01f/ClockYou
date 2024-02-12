@@ -89,7 +89,7 @@ fun AlarmRow(alarm: Alarm, alarmModel: AlarmModel) {
                 )
                 Text(
                     modifier = Modifier.padding(start = 6.dp),
-                    text = (alarm.tzName ?: "Local") + " ($relativeTimeString)"
+                    text = alarm.tzDisplayName ?: "Local ($relativeTimeString)"
                 )
             }
 
@@ -146,7 +146,8 @@ fun AlarmRow(alarm: Alarm, alarmModel: AlarmModel) {
                     alarm.enabled = newValue
                     isEnabled = newValue
 
-                    if (isEnabled) {
+                    // only show the toast for local alarms
+                    if (isEnabled && alarm.tzId == null) {
                         val millisRemainingForAlarm = (AlarmHelper.getAlarmTime(alarm) - System.currentTimeMillis())
                         val formattedDuration = TimeHelper.durationToFormatted(context, millisRemainingForAlarm.milliseconds)
                         Toast.makeText(
@@ -155,6 +156,8 @@ fun AlarmRow(alarm: Alarm, alarmModel: AlarmModel) {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
+
+                    // todo: show a nice toast for timezoned alarms
 
                     alarmModel.updateAlarm(context, alarm)
                 }
