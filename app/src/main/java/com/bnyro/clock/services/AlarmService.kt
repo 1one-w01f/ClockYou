@@ -41,10 +41,10 @@ class AlarmService : Service() {
     private val alarmActionReciever = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.getStringExtra(ACTION_EXTRA_KEY)) {
-                DISMISS_ACTION -> onDestroy()
+                DISMISS_ACTION -> stopSelf()
                 SNOOZE_ACTION -> {
                     AlarmHelper.snooze(this@AlarmService, currentAlarm!!)
-                    onDestroy()
+                    stopSelf()
                 }
             }
         }
@@ -68,18 +68,28 @@ class AlarmService : Service() {
         super.onCreate()
     }
 
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        stop()
+//        timer!!.cancel()
+//        timer = null
+//        Log.d("AlarmService.onDestroy", "Destroying service")
+//        try {
+//            unregisterReceiver(alarmActionReciever)
+//        } catch (e: Exception) {
+//            Log.e("AlarmService.onDestroy", "exception $e")
+//        }
+//        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+//    }
+
     override fun onDestroy() {
         stop()
         timer.cancel()
-        Log.d("Alarm Service", "Destroying service")
-        try { // todo: this is an ugly hack to deal w/ java.lang.RuntimeException: Unable to stop service com.bnyro.clock.services.AlarmService@c71cea0: java.lang.IllegalArgumentException: Receiver not registered: com.bnyro.clock.services.AlarmService$alarmActionReciever$1@929ea59
-            unregisterReceiver(alarmActionReciever)
-        } catch (e: Exception) {
-            Log.e("AlarmService", "exception $e")
-        }
+        unregisterReceiver(alarmActionReciever)
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         super.onDestroy()
     }
+
 
     override fun onBind(intent: Intent): IBinder? {
         return null
@@ -96,7 +106,7 @@ class AlarmService : Service() {
         currentAlarm = alarm
         timer.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
-                onDestroy()
+                stopSelf()
             }
         }, AUTO_SNOOZE_MINUTES * 60 * 1000L, AUTO_SNOOZE_MINUTES * 60 * 1000L)
         return START_STICKY
