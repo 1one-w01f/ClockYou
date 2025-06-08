@@ -157,6 +157,12 @@ fun AlarmRow(alarm: Alarm, alarmModel: AlarmModel) {
                         ).show()
                     }
 
+//                    Toast.makeText(
+//                        context,
+//                        "the alarm id was ${alarm.id}",
+//                        Toast.LENGTH_LONG
+//                    ).show()
+                    
                     // todo: show a nice toast for timezoned alarms
 
                     alarmModel.updateAlarm(context, alarm)

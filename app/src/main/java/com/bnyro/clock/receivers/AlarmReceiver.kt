@@ -22,51 +22,44 @@ class AlarmReceiver : BroadcastReceiver() {
             DatabaseHolder.instance.alarmsDao().findById(id)
         }
 
+//        if (alarm == null) {
+//            Log.e("myTag", "idk why but alarm is null")
+//            Log.e("myTag", "the null alarm had an id $id")
+//        }
+
         val currentDay = TimeHelper.getCurrentWeekDay()
 
-        if (!alarm.repeat) { // original handling logic for non-repeat alarms
-            val playAlarm = Intent(context, AlarmService::class.java)
-            playAlarm.putExtra(AlarmHelper.EXTRA_ID, id)
-            ContextCompat.startForegroundService(context, playAlarm)
-        }
-        else {
-            if (alarm.tzId == null) { // original handling logic for local alarms
-                if (currentDay - 1 in alarm.days) {
-                    val playAlarm = Intent(context, AlarmService::class.java)
-                    playAlarm.putExtra(AlarmHelper.EXTRA_ID, id)
-                    ContextCompat.startForegroundService(context, playAlarm)
-                }
+        if (alarm.tzId.isNullOrBlank()) { // original handling logic for local alarms (w/o timezone)
+
+            // if today is one of the days that the alarm should fire
+            // or that this is an one-off alarm, then we play the alarm
+            if (currentDay - 1 in alarm.days || !alarm.repeat) {
+                val playAlarm = Intent(context, AlarmService::class.java)
+                playAlarm.putExtra(AlarmHelper.EXTRA_ID, id)
+                ContextCompat.startForegroundService(context, playAlarm)
             }
-            else { // new handling logic for repeat alarms w/ timezone
 
-                val calendar = GregorianCalendar()
-                calendar.time = TimeHelper.currentTime
+        } else { // new handling logic for alarms w/ timezone
+            val curCal = GregorianCalendar()
+            curCal.time = TimeHelper.currentTime
 
-                val alarmTz = TimeZone.getTimeZone(alarm.tzId)
-                val alarmTzOffset = alarmTz.getOffset(Calendar.getInstance().timeInMillis)
+            val alarmTz = TimeZone.getTimeZone(alarm.tzId)
+            val alarmTzOffset = alarmTz.getOffset(Calendar.getInstance().timeInMillis)
 
-                val localTz = TimeZone.getDefault()
-                val localTzOffset = localTz.getOffset(Calendar.getInstance().timeInMillis)
+            val localTz = TimeZone.getDefault()
+            val localTzOffset = localTz.getOffset(Calendar.getInstance().timeInMillis)
 
-                // current time in the alarm time zone
-                calendar.add(Calendar.MILLISECOND, alarmTzOffset - localTzOffset)
+            // current time in the alarm time zone
+            curCal.add(Calendar.MILLISECOND, alarmTzOffset - localTzOffset)
 
-//                val dow = calendar.get(Calendar.DAY_OF_WEEK)
-//                Log.d("myTag", "new handling logic for repeat alarms w/ timezone")
-//                Log.d("myTag", "alarm.days = ${alarm.days}")
-//                Log.d("myTag", "alarm day of week = $dow")
-//                Log.d("myTag", "dest alarm epoch time = ${calendar.time.time}")
-
-                if (calendar.get(Calendar.DAY_OF_WEEK) - 1 in alarm.days) {
-                    val playAlarm = Intent(context, AlarmService::class.java)
-                    playAlarm.putExtra(AlarmHelper.EXTRA_ID, id)
-                    ContextCompat.startForegroundService(context, playAlarm)
-                }
-
+            // if today (in the alarm time zone) is one of the days that the alarm should fire
+            // or that this is an one-off alarm, then we play the alarm
+            if (curCal.get(Calendar.DAY_OF_WEEK) - 1 in alarm.days || !alarm.repeat) {
+                val playAlarm = Intent(context, AlarmService::class.java)
+                playAlarm.putExtra(AlarmHelper.EXTRA_ID, id)
+                ContextCompat.startForegroundService(context, playAlarm)
             }
         }
-
-
 
         // re-enqueue the alarm for the next day
         if (alarm.repeat) {
@@ -77,5 +70,6 @@ class AlarmReceiver : BroadcastReceiver() {
                 DatabaseHolder.instance.alarmsDao().update(alarm)
             }
         }
+
     }
 }

@@ -233,9 +233,11 @@ fun AlarmScreen(
 
 
                         val alarm = Alarm(
-                            time = alarmTime, tzId = timezone.name,
+                            time = alarmTime, tzId = timezone.name, enabled = true,
                             tzDisplayName = timezone.displayName)
-                        alarmModel.createAlarm(alarm)
+                        val alarmId = alarmModel.createAlarm(alarm)
+                        alarm.id = alarmId
+                        alarmModel.updateAlarm(context, alarm)
 
                         Log.d("myTag", "timezome " + timezone.countryName)
                         Log.d("myTag", "timezome " + timezone.displayName)
@@ -251,9 +253,13 @@ fun AlarmScreen(
             dismissButton = {
                 DialogButton(label = android.R.string.cancel) {
                     // create the original alarm on dismiss
-                    val alarm = Alarm(time = alarmTime)
-                    alarmModel.createAlarm(alarm)
+                    val alarm = Alarm(time = alarmTime, enabled = true)
+                    val alarmId = alarmModel.createAlarm(alarm)
+                    alarm.id = alarmId
+                    alarmModel.updateAlarm(context, alarm)
 
+
+                    Log.d("myTag", "alarm.id ${alarm.id} created and updated");
                     Log.d("myTag", "alarmTime $alarmTime");
 
 

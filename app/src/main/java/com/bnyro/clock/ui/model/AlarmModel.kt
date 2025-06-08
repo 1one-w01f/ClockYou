@@ -1,6 +1,7 @@
 package com.bnyro.clock.ui.model
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.Collections
 
 class AlarmModel : ViewModel() {
@@ -38,10 +40,23 @@ class AlarmModel : ViewModel() {
             initialValue = listOf()
         )
 
-    fun createAlarm(alarm: Alarm) {
-        viewModelScope.launch(Dispatchers.IO) {
+    fun createAlarm(alarm: Alarm): Long {
+
+        // we modified this to return the ID after inserting into the DB
+        // we need the ID so that we can update (enqueue) a new alarm after creation
+
+        val retId: Long = runBlocking {
             DatabaseHolder.instance.alarmsDao().insert(alarm)
         }
+//        var retId: Long = 0
+//        viewModelScope.launch(Dispatchers.IO) {
+//            retId = DatabaseHolder.instance.alarmsDao().insert(alarm)
+//
+//            Log.e("myTag", "inside viewModelScope, retId from createAlarm is $retId")
+//        }
+//        Log.e("myTag", "outside viewModelScope, retId from createAlarm is $retId")
+        Log.e("myTag", "retId from createAlarm is $retId")
+        return retId
     }
 
     fun updateAlarm(context: Context, alarm: Alarm) {
